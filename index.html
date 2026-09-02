@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>QEC Tiles — Stabilizer Rush</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ===================== TUTORIAL / HOW TO PLAY ===================== -->
+  <section id="screen-tutorial" class="screen">
+    <div class="tutorial-body">
+      <div class="tutorial-demo-panel big">
+        <button class="skip-link" id="btn-tutorial-skip">Skip &rarr;</button>
+
+        <div class="demo-board" id="demo-board">
+          <div class="demo-col" style="left:6%">
+            <div class="demo-qubit data" id="demo-d0"><span id="demo-d0-num">0</span></div>
+            <div class="demo-tag">DATA</div>
+          </div>
+          <div class="demo-col" style="left:31%">
+            <div class="demo-qubit anc" id="demo-a0"><span id="demo-a0-num">0</span></div>
+            <div class="demo-tag">CHECK</div>
+          </div>
+          <div class="demo-col" style="left:50%">
+            <div class="demo-qubit data" id="demo-d1"><span id="demo-d1-num">0</span></div>
+            <div class="demo-tag">DATA</div>
+          </div>
+          <div class="demo-col" style="left:69%">
+            <div class="demo-qubit anc" id="demo-a1"><span id="demo-a1-num">0</span></div>
+            <div class="demo-tag">CHECK</div>
+          </div>
+          <div class="demo-col" style="left:94%">
+            <div class="demo-qubit data" id="demo-d2"><span id="demo-d2-num">0</span></div>
+            <div class="demo-tag">DATA</div>
+          </div>
+        </div>
+
+        <p class="demo-caption" id="demo-caption">Big = DATA. Small = CHECK.</p>
+
+        <div class="tutorial-dots" id="tutorial-dots"></div>
+
+        <div class="tutorial-nav">
+          <button class="ghost-btn" id="btn-tutorial-back">&larr; Back</button>
+          <button class="primary-btn" id="btn-tutorial-next">Next &rarr;</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================== MENU SCREEN ===================== -->
+  <section id="screen-menu" class="screen">
+    <header class="hero">
+      <h1>QEC TILES</h1>
+      <p class="tagline">Stabilizer Rush — be the decoder before the markers hit the ancillas</p>
+    </header>
+
+    <div class="name-entry">
+      <label for="player-name-input">Your name <span class="name-entry-sub">(leaderboard + prize)</span></label>
+      <input type="text" id="player-name-input" maxlength="24" placeholder="Enter your name…" autocomplete="off" />
+    </div>
+
+    <div class="speed-entry">
+      <label for="speed-slider">Starting speed <span id="speed-value">2.2s / round</span></label>
+      <input type="range" id="speed-slider" min="800" max="4000" step="100" value="2200" />
+      <div class="speed-slider-labels"><span>⚡ Fast</span><span>🐢 Slow</span></div>
+    </div>
+
+    <div class="speed-entry">
+      <label for="error-slider">Error rate <span id="error-value">55%</span></label>
+      <input type="range" id="error-slider" min="30" max="80" step="5" value="55" />
+      <div class="speed-slider-labels"><span>😌 Calm</span><span>🔥 Chaotic</span></div>
+    </div>
+
+    <div class="level-grid" id="level-grid"></div>
+
+    <footer class="menu-footer">
+      <button class="ghost-btn" id="btn-how-to-play">❓ How to play</button>
+      <button class="ghost-btn" id="btn-view-leaderboard">🏆 Leaderboard</button>
+      <button class="ghost-btn" id="btn-clear-scores">Reset leaderboard</button>
+      <span class="hint">Pick a level to begin. Later levels unlock once you survive the one before.</span>
+    </footer>
+  </section>
+
+  <!-- ===================== LEADERBOARD (standalone) ===================== -->
+  <section id="screen-leaderboard" class="screen">
+    <button class="back-btn" id="btn-leaderboard-back">&larr; Levels</button>
+    <header class="hero small">
+      <h1>🏆 LEADERBOARD</h1>
+      <p class="tagline">Global ranks your best score on every level, weighted by how hard it is.</p>
+    </header>
+
+    <div class="lb-tabs" id="lb-tabs"></div>
+    <div class="lb-panel">
+      <ol class="leaderboard-list big" id="lb-standalone-list"></ol>
+      <p class="lb-empty" id="lb-empty" hidden>No runs yet on this level — be the first!</p>
+    </div>
+  </section>
+
+  <!-- ===================== COUNTDOWN ===================== -->
+  <section id="screen-countdown" class="screen">
+    <div class="countdown-wrap">
+      <div class="countdown-num" id="countdown-num">3</div>
+      <div class="countdown-label" id="countdown-label">Stabilizer round incoming…</div>
+    </div>
+  </section>
+
+  <!-- ===================== GAME SCREEN ===================== -->
+  <section id="screen-game" class="screen">
+    <div class="hud">
+      <div class="hud-item">
+        <span class="hud-label">Level</span>
+        <span class="hud-value" id="hud-level">—</span>
+      </div>
+      <div class="hud-item">
+        <span class="hud-label">Score</span>
+        <span class="hud-value" id="hud-score">0</span>
+      </div>
+      <div class="hud-item">
+        <span class="hud-label">Streak</span>
+        <span class="hud-value" id="hud-streak">0</span>
+      </div>
+      <div class="hud-item">
+        <span class="hud-label">Round</span>
+        <span class="hud-value" id="hud-round">0</span>
+      </div>
+      <div class="hud-item hud-lives">
+        <span class="hud-label">Lives</span>
+        <span class="hud-value" id="hud-lives">♥♥♥</span>
+      </div>
+    </div>
+
+    <div class="board-wrap" id="board-wrap">
+      <div class="tile-layer" id="tile-layer"></div>
+      <div class="board" id="board">
+        <div class="impact-line"></div>
+        <div class="qubit-layer" id="qubit-layer"></div>
+      </div>
+    </div>
+
+    <div class="controls-row" id="controls-row">
+      <div class="control-hint">Ancillas light up the moment a round starts. Click the data qubits you think flipped (multiple allowed), then lock in before the tile lands.</div>
+      <button class="noflip-btn" id="btn-lockin">LOCK IN <kbd>ENTER</kbd></button>
+    </div>
+  </section>
+
+  <!-- ===================== RESULTS SCREEN ===================== -->
+  <section id="screen-results" class="screen">
+    <div class="results-card">
+      <h2 id="results-title">Round Complete</h2>
+      <div class="survive-banner" id="survive-banner">LOGICAL QUBIT SURVIVED</div>
+      <p class="survive-explain" id="survive-explain"></p>
+
+      <div class="results-stats">
+        <div class="stat"><span class="stat-num" id="stat-score">0</span><span class="stat-label">Score</span></div>
+        <div class="stat"><span class="stat-num" id="stat-acc">0%</span><span class="stat-label">Your Accuracy</span></div>
+        <div class="stat"><span class="stat-num" id="stat-best-streak">0</span><span class="stat-label">Best Streak</span></div>
+        <div class="stat"><span class="stat-num" id="stat-rounds">0</span><span class="stat-label">Rounds Survived</span></div>
+      </div>
+
+      <div class="leaderboard-panel">
+        <h3>Leaderboard — <span id="leaderboard-level-name"></span></h3>
+        <ol class="leaderboard-list" id="leaderboard-list"></ol>
+      </div>
+
+      <div class="results-actions">
+        <button class="primary-btn" id="btn-retry">Retry Level</button>
+        <button class="primary-btn accent" id="btn-next-level">Next Level &rarr;</button>
+        <button class="ghost-btn" id="btn-to-menu">Level Select</button>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script src="game.js"></script>
+</body>
+</html>
