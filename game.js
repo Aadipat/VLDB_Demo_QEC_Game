@@ -770,16 +770,6 @@ document.getElementById('btn-leaderboard-back').addEventListener('click', () => 
 // ---------------------- STATIC UI WIRING ----------------------
 document.getElementById('btn-lockin').addEventListener('click', lockIn);
 
-document.getElementById('btn-clear-scores').addEventListener('click', () => {
-  if (confirm('Reset all leaderboard scores and level progress?')) {
-    leaderboard = {};
-    progress = {};
-    saveLeaderboard();
-    saveProgress();
-    renderLevelGrid();
-  }
-});
-
 const nameInput = document.getElementById('player-name-input');
 nameInput.value = localStorage.getItem(PLAYERNAME_KEY) || '';
 nameInput.addEventListener('input', () => {
